@@ -4,6 +4,19 @@ EduJustice is an independent education-transparency and student-rights platform.
 
 > EduJustice is not a government organization and does not claim official affiliation.
 
+## Open the project correctly
+
+Do **not** double-click the source `index.html`; a Vite application must run through its development server or a deployed URL.
+
+On Windows, double-click `START_EDUJUSTICE.cmd`. It installs dependencies when needed, starts the local server, and opens the working site automatically.
+
+Alternatively:
+
+```bash
+npm install
+npm start
+```
+
 ## Features
 
 - Premium responsive cyber-civic interface
