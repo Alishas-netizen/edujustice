@@ -16,6 +16,17 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
+async function retry<T>(task: () => Promise<T>, attempts = 3): Promise<T> {
+  let lastError: unknown
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try { return await task() } catch (error) {
+      lastError = error
+      if (attempt < attempts - 1) await new Promise((resolve) => setTimeout(resolve, 350 * (attempt + 1)))
+    }
+  }
+  throw lastError
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [role, setRole] = useState<'user' | 'admin'>('user')
@@ -26,8 +37,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return onAuthStateChanged(auth, async (nextUser) => {
       setUser(nextUser)
       if (nextUser) {
-        const token = await nextUser.getIdTokenResult()
-        setRole(token.claims.admin === true ? 'admin' : 'user')
+        try {
+          const token = await nextUser.getIdTokenResult()
+          setRole(token.claims.admin === true ? 'admin' : 'user')
+        } catch {
+          setRole('user')
+        }
       } else setRole('user')
       setLoading(false)
     })
@@ -38,11 +53,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login: async (email, password) => { await signInWithEmailAndPassword(auth, email, password) },
     register: async (name, email, password) => {
       const credential = await createUserWithEmailAndPassword(auth, email, password)
-      await updateProfile(credential.user, { displayName: name })
       const userRef = doc(db, 'users', credential.user.uid)
-      if (!(await getDoc(userRef)).exists()) {
-        await setDoc(userRef, { uid: credential.user.uid, name, email, role: 'user', createdAt: serverTimestamp() })
-      }
+      await Promise.allSettled([
+        retry(() => updateProfile(credential.user, { displayName: name })),
+        retry(async () => {
+          if (!(await getDoc(userRef)).exists()) {
+            await setDoc(userRef, { uid: credential.user.uid, name, email, role: 'user', createdAt: serverTimestamp() })
+          }
+        }),
+      ])
     },
     logout: async () => { await signOut(auth) },
   }), [user, role, loading])

@@ -33,6 +33,7 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: edujustice-pika-2026.firebasestorage.app
           VITE_FIREBASE_MESSAGING_SENDER_ID: 132524080500
           VITE_FIREBASE_APP_ID: 1:132524080500:web:fd007f25351b2c7c08c021
+          VITE_EVIDENCE_UPLOADS_ENABLED: 'false'
       - run: cp dist/index.html dist/404.html
       - uses: actions/configure-pages@v5
         with:

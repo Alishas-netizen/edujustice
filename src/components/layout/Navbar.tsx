@@ -33,6 +33,9 @@ export function Navbar() {
       {open && <nav className="mobile-nav container-x" aria-label="Mobile navigation">
         {nav.map(([label, path]) => <NavLink key={path} to={path} onClick={() => setOpen(false)}>{label}</NavLink>)}
         <NavLink to="/track" onClick={() => setOpen(false)}>Track complaint</NavLink>
+        {user
+          ? <NavLink to="/dashboard" onClick={() => setOpen(false)}>Dashboard</NavLink>
+          : <><NavLink to="/login" onClick={() => setOpen(false)}>Login</NavLink><NavLink to="/register" onClick={() => setOpen(false)}>Create account</NavLink></>}
       </nav>}
     </header>
   )
