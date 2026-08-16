@@ -39,8 +39,14 @@ export async function submitComplaint(input: ComplaintInput, userId: string, onP
 }
 
 export async function getUserComplaints(userId: string): Promise<Complaint[]> {
-  const result = await getDocs(query(collection(db, 'complaints'), where('userId', '==', userId), orderBy('createdAt', 'desc'), limit(100)))
-  return result.docs.map((item) => ({ id: item.id, ...item.data() }) as Complaint)
+  const result = await getDocs(query(collection(db, 'complaints'), where('userId', '==', userId), limit(100)))
+  return result.docs
+    .map((item) => ({ id: item.id, ...item.data() }) as Complaint)
+    .sort((a, b) => {
+      const aTime = a.createdAt instanceof Date ? a.createdAt.getTime() : a.createdAt?.toMillis() || 0
+      const bTime = b.createdAt instanceof Date ? b.createdAt.getTime() : b.createdAt?.toMillis() || 0
+      return bTime - aTime
+    })
 }
 
 export async function trackComplaint(complaintId: string, userId: string): Promise<Complaint | null> {
