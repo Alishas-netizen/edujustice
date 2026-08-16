@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function owner(userId) { return signedIn() && request.auth.uid == userId; }
+    function admin() { return signedIn() && request.auth.token.admin == true; }
+
+    match /users/{userId} {
+      allow create: if owner(userId)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.role == 'user';
+      allow read: if owner(userId) || admin();
+      allow update: if owner(userId)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.email == resource.data.email;
+      allow delete: if false;
+    }
+
+    match /complaints/{complaintDoc} {
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'Submitted'
+        && request.resource.data.issueType is string
+        && request.resource.data.institution is string
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 5000
+        && request.resource.data.evidencePaths.size() <= 1;
+      allow read: if owner(resource.data.userId) || admin();
+      allow update: if admin()
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.complaintId == resource.data.complaintId;
+      allow delete: if false;
+    }
+
+    match /institutions/{institutionId} {
+      allow read: if true;
+      allow write: if admin();
+    }
+
+    match /statistics/{statId} {
+      allow read: if true;
+      allow write: if admin();
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}

@@ -1,0 +1,3 @@
+import { PageHeader } from '../components/ui/PageHeader'
+import { solutions } from '../data/content'
+export function SolutionsPage(){return <><PageHeader eyebrow="Action framework" title="How can we stop it?" description="Fair education needs visible processes, verifiable records, safe reporting, and accountability that extends beyond promises."/><section className="section"><div className="container-x"><div className="solution-list">{solutions.map((item,i)=><div className="solution-row" key={item.title}><span>0{i+1}</span><item.icon/><h3>{item.title}</h3><p>{item.description}</p></div>)}</div></div></section></>}

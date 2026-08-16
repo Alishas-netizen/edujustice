@@ -1,0 +1,4 @@
+import { PageHeader } from '../components/ui/PageHeader'
+import { Reveal } from '../components/ui/Reveal'
+import { corruptionTypes } from '../data/content'
+export function CorruptionPage(){return <><PageHeader eyebrow="Understand the problem" title="What is education corruption?" description="Education corruption is the misuse of authority, process, or resources for unfair private benefit. Recognizing it is the first step toward challenging it."/><section className="section"><div className="container-x grid-3">{corruptionTypes.map((item,i)=><Reveal key={item.title} delay={i*.06}><article className="card card-hover" style={{minHeight:300}}><div className="icon-box"><item.icon/></div><span className="section-index">THREAT / 0{i+1}</span><h3>{item.title}</h3><p>{item.description}</p></article></Reveal>)}</div></section></>}

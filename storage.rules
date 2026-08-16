@@ -1,0 +1,17 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() { return request.auth != null; }
+    function owner(userId) { return signedIn() && request.auth.uid == userId; }
+    function admin() { return signedIn() && request.auth.token.admin == true; }
+
+    match /evidence/{userId}/{complaintId}/{fileName} {
+      allow read: if owner(userId) || admin();
+      allow create: if owner(userId)
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/jpeg|image/png|application/pdf');
+      allow update, delete: if false;
+    }
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}
