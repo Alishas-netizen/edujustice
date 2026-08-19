@@ -4,6 +4,13 @@ EduJustice is an independent education-transparency and student-rights platform.
 
 > EduJustice is not a government organization and does not claim official affiliation.
 
+## Project team
+
+| Name | Roll number |
+| --- | --- |
+| Alisha Raut | 25805003 |
+| Anchal Somkuwar | 25805004 |
+
 ## Open the project correctly
 
 Do **not** double-click the source `index.html`; a Vite application must run through its development server or a deployed URL.
